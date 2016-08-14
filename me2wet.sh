@@ -1,2 +1,2 @@
 #! /bin/bash
-scp $1 -P801 pi@73.222.30.143:/home/pi/wet/$1
+scp $1 -P801 pi@67.170.222.39:/home/pi/wet/$1

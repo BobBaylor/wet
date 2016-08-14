@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 
 """ wetbin.py water log timestamp binning script
     This can be run from any of my 4 locations and it will make sure the waterlog.txt file is copied to where I am.
@@ -23,9 +24,10 @@ oneTickVol = oneCycleVol*0.5     # about 3/8 of a gallon = 3 pints
 def makeTime(s):   # seems like this should be in the lib but I can't find it
   try:
     if len(s) < 18:
-      t = time.mktime(datetime.strptime( s, '%y-%m-%d %H:%M:%S' ).timetuple())
+        t = time.mktime(datetime.strptime( s, '%y-%m-%d %H:%M:%S' ).timetuple())   # old style up to 2016-06-13
     else:
-      t = time.mktime(datetime.strptime( s, '%y-%m-%d %H:%M:%S.%f' ).timetuple())
+        v = datetime.strptime( s, '%y-%m-%d %H:%M:%S.%f' )                         # new style with microseconds
+        t = time.mktime(v.timetuple())+(v.microsecond*1e-6)
   except ValueError:
     print 'makeTime() ValueError'
     t = None
@@ -64,14 +66,14 @@ def showHeader(c,b):
     tFmt = '%S'
   # print time.strftime('%y-%m-%d %H:%M:%S',time.localtime(b[0])), w
   tms = [time.strftime(tFmt,time.localtime(b[i])) for i in range(c)]
-  print '%-16s'%('gallons')+'%5s'*c%tuple(tms),
+  print '%-17s'%('gallons')+'%5s'*c%tuple(tms),
 
 
 def showBined(d,c,m):
   i = 0
   for j, x in enumerate(d):
     if i == 0:
-      print '\n%5.1f%11s'% (oneTickVol*sum(d[j:j+c]),time.strftime('%a %H:%M',time.localtime(m[j]))),
+      print '\n%6.1f%11s'% (oneTickVol*sum(d[j:j+c]),time.strftime('%a %H:%M',time.localtime(m[j]))),
     if x>0:
         print '%4.0f'%(x*oneTickVol),
     else:
