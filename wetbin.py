@@ -46,7 +46,7 @@ def binTimes(tms,first,wid,cnt):
 
 
 # returns 1 ip address, not 127.0.0.0 as a list of octet strings. '88' means pi; '192' means 260; '172' means SRS and '10' meas 7C
-def getMyIp():
+def getMyIp():              # not used
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(('8.8.8.8', 80))  # connecting to a UDP address doesn't send packets
     retS = s.getsockname()[0]
@@ -100,28 +100,14 @@ def getStampList(lines):    # convert timestamp text lines to a list of numbers 
 def getWaterLines(bUseExisting):    # get a list filled with all the timestamp text lines
     # I could do this with platform.system() which returns 'Linux', 'Darwin', or 'Windows'
     if not bUseExisting:
-        # determine where we are so we can get the waterlog.txt file here: 260, SRS, 7C, or on the pi
-        """
-        myip = getMyIp()    # returns 1 ip address, not 127.0.0.0 as a list of octet strings. '88' means pi; '192' means 260; '172' means SRS and '10' meas 7C
-        if '192' in myip[0] and '88' in myip[3]:  # I'm on the pi the file is already here
-            pass
-        elif '172' in myip[0]:                    # I'm at the SRS ip
-            os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@73.222.30.143:/home/pi/wet/waterlog.txt .' )  # from SRS
-        elif '192' in myip[0]:                    # I'm on the 260 mac
-            os.system('scp pi@192.168.2.88:/home/pi/wet/waterlog.txt .' ) # from 260
-        elif '10' in myip[0]:                     # I'm at 7C
-            os.system('scp -P 801 pi@73.222.30.143:/home/pi/wet/waterlog.txt .' )       # from 7C
-        else:   # I don't know where I am
-            print 'where am I?','.'.join(myip)
-            return []
-        """
+        # determine the OS so we can use the proper cmd to get the waterlog.txt file here
         myos = platform.system()    # returns 'Linux', 'Darwin', or 'Windows'
-        if 'Linux' in myos:  # I'm on the pi the file is already here
-            pass
-        elif 'Windows' in myos:                    # I'm at the SRS ip
-            os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )  # from SRS
+        if 'Linux' in myos:         # I'm on the pi: the file is already here
+            pass                    # todo: differentiate between the wet host and another Linux box
+        elif 'Windows' in myos:                    # I'm on my Win box
+            os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )
         elif 'Darwin' in myos:                     # I'm at 7C
-            os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # from 7C
+            os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
         else:   # I don't know where I am
             print 'where am I?',myos
             return []
@@ -137,7 +123,7 @@ def footer(stamps):
     print '   last interval at %.3f gpm'%(oneTickVol*60.0/(stamps[-1]-stamps[-2]))
 
 if __name__ == '__main__':
-    print 'wetbin.py stand alone'
+    print 'Running wetbin.py stand alone. Try wetui.py for more features.'
     lines = getWaterLines(False)
     stamps = getStampList(lines)
     b, m = binTimes(stamps,makeTime(tStartStr),tBinSecs,cntBins)
