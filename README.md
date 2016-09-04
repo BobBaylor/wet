@@ -22,6 +22,19 @@ resulting timestamp data in fun ways.
  * With the permanent drought in California, I wanted to see exactly how much water my house uses and on what. 
  * It seemed like an easy project for a raspberry pi.
 
+### How much time and money would it take to do this at my house?
+ * Money (plus tax and shipping):
+   * $70 for the [SPWM-075](http://www.ekmmetering.com/3-4-water-meter-stainless-steel-pulse-output.html) from EKM 
+   * $90 [Raspberry pi 3 starter.](https://www.adafruit.com/products/3058) more than you need for this project but less trouble than buying all the parts individually.
+   * $8 optional stuff to solder it togetther instead of plug board (assumes you have a soldering iron):
+     * $5 [PCB breadboard](https://www.adafruit.com/products/1609)  
+     * $2 [IDC breakout header](https://www.adafruit.com/products/2270) for the PCB breadboard
+   * $150 to hire a plumber to install the water meter? I don't really know. I have all the tools because I replumbed my entire house a few years ago. YMMV.
+ * Time (depends a great deal on your experience with the pi, Linux, etc)
+   * 2 weeks waiting for UPS to deliver the parts
+   * an afternoon to install the SPWM-075 into the main supply line. May include one or more trips to the hardware store for the parts that you thought you had but can't find in all the junk in your basement/garage/attic.
+   * an evening to install python on your windows computer 
+
 ### Why go to the trouble of installing your own water meter?
 The San Jose Water Company meter is out at the street. I could have tried opening it up, gluing a magnet on the fastest 
 dial, and gluing a reed switch on the outside, but I'm guessing SJWC would not like that. So it seemed less
