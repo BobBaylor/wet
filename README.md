@@ -26,7 +26,7 @@ resulting timestamp data in fun ways.
  * Money (plus tax and shipping):
    * $70 for the [SPWM-075](http://www.ekmmetering.com/3-4-water-meter-stainless-steel-pulse-output.html) from EKM 
    * $90 [Raspberry pi 3 starter.](https://www.adafruit.com/products/3058) more than you need for this project but less trouble than buying all the parts individually.
-   * $8 optional stuff to solder it togetther instead of plug board (assumes you have a soldering iron):
+   * $7 optional stuff to solder it togetther instead of plug board (assumes you have a soldering iron):
      * $5 [PCB breadboard](https://www.adafruit.com/products/1609)  
      * $2 [IDC breakout header](https://www.adafruit.com/products/2270) for the PCB breadboard
    * $150 to hire a plumber to install the water meter? I don't really know. I have all the tools because I replumbed my entire house a few years ago. YMMV.
