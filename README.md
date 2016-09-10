@@ -43,13 +43,15 @@ dial, and gluing a reed switch on the outside, but I'm guessing SJWC would not l
 trouble and more reliable to install my own meter in the main supply line. 
 
 ### How complicated is it to hook the water meter to the pi?
-Not hard at all. There's a 40 pin connector no the pi with General Purpose Input Output (GPIO). I only needed the first 10 pins so that's all I show in the schematic below. The pi starter kit has a 40 pin cable. Be sure to plug it in properly (pin 1 to pin 1).
+Not very complicated: There's a 40 pin connector on the pi with General Purpose Input Output (GPIO). I only needed the first 10 pins so that's all I show in the schematic below. The pi starter kit has a 40 pin cable. Be sure to plug it in properly (pin 1 to pin 1).
 ![Schematic](https://github.com/BobBaylor/wet/blob/master/wet_interface.png)
  * Pin 1 from the pi supplies 3.3 volts to this circuit.
  * Pin 9 is the ground return for the 3.3 volt power from the pi.
  * Pin 7 of the pi is the reed switch input:
    * The 10k resistor is a "pull up" that defines the input (3.3) voltage when the reed switch is open.
-   * R2, R3, and R4 form a voltage divider that defines the input (0.3) when the reed switch is closed. * Use a red or green LED. 
+   * R2, R3, and R4 form a voltage divider that defines the input (0.3) when the reed switch is closed.
+   * Use a red or green LED.
+ 
  * The pair of wires to the reed switch can be anything you have laying around: telephone wire, sprinkler wire, speaker wire, etc. 
  * The 560 ohm resistors in series with the reed switch are a half-ass attempt to protect the pi from damage. 
  
