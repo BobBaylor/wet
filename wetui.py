@@ -32,8 +32,6 @@ if __name__ == '__main__':
     opts = docopt.docopt(useStr,version='0.0.2')
     # print opts
 
-    lines = getWaterLines(opts['--offline'])
-    stamps = getStampList(lines)
     cntCols = int(opts['--columns'])
     tBinSecs = float(opts['--width'])
     cntBins = int(opts['--bins'])
@@ -55,6 +53,7 @@ if __name__ == '__main__':
         dtl[5] = 0
 
       dtFirst = dtInc+time.mktime(time.struct_time(tuple(dtl)))
+      opts['--first'] = time.strftime('%y-%m-%d',time.localtime(dtFirst))
     else:   # todo: this hasn't been tested like the above code -------
       tStart = opts['--times'].split(',')[0]
       dtFirst = makeTime(opts['--first']+' '+tStart)
@@ -62,6 +61,9 @@ if __name__ == '__main__':
     print 'start at',time.strftime('%y-%m-%d',time.localtime(dtFirst))
     cntBins = int(1.999+cntBins/cntCols)*cntCols  # round bins up to complete rows
 
+    lines = getWaterLines(opts['--offline'])
+    lines = sliceWaterLines(lines,opts['--first'],opts['--last'])
+    stamps = getStampList(lines)
     b, m = binTimes(stamps,dtFirst,tBinSecs,cntBins)
     showHeader(cntCols,m)
     showBined(b,cntCols,m)

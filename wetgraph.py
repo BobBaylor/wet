@@ -41,10 +41,6 @@ if __name__ == '__main__':
     opts = docopt.docopt(useStr,version='0.0.2')
     # print opts
 
-    lines = getWaterLines(opts['--offline'])     # get a list of the raw file lines
-    stamps = getStampList(lines)                # make a list of time floats
-    print '%d ticks = %.0f gal or %.1f ccf'%(len(stamps),len(stamps)*oneTickVol,len(stamps)*oneTickVol/748.02)
-
     # do complete rows that include the start and stop bins
     tStart = opts['--times'].split(',')[0]
     dtFirst = time.mktime(datetime.strptime( opts['--first']+' '+tStart, '%y-%m-%d %H:%M:%S' ).timetuple())
@@ -54,6 +50,11 @@ if __name__ == '__main__':
         dtLast2 = time.mktime(datetime.strptime( opts['--last']+' 23:59:59', '%y-%m-%d %H:%M:%S' ).timetuple())
     print 'From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)),
     print 'to',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtLast2)), 'inclusive'
+
+    lines = getWaterLines(opts['--offline'])     # get a list of the raw file lines
+    lines = sliceWaterLines(lines,opts['--first'],opts['--last'])
+    stamps = getStampList(lines)                # make a list of time floats
+    print '%d ticks = %.0f gal or %.1f ccf'%(len(stamps),len(stamps)*oneTickVol,len(stamps)*oneTickVol/748.02)
 
     if not opts['--double']:
         stamps = stamps[::2]

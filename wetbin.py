@@ -10,8 +10,7 @@ import platform
 import socket
 from datetime import date, datetime
 
-ip260 = '67.170.222.39'
-# 73.222.30.143
+ip260 = '73.222.30.143'
 tStartStr = '15-11-21 00:00:00'
 tBinSecs = 3600.0
 cntBins = 228
@@ -95,6 +94,22 @@ def getStampList(lines):    # convert timestamp text lines to a list of numbers 
             # stamps += [time.mktime(datetime.strptime( ln, '%y-%m-%d %H:%M:%S' ).timetuple())]
             stamps += [t]
     return stamps
+
+
+def sliceWaterLines(lines,first,last):
+    bInRange = False
+    print first, last
+    x = []
+    for l in lines:
+        if bInRange:
+            x += [l]
+            if last in l:
+                bInRange = False
+        else:
+            if first in l:
+                bInRange = True
+                x += [l]
+    return x
 
 
 def getWaterLines(bUseExisting):    # get a list filled with all the timestamp text lines
