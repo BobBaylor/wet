@@ -3,9 +3,9 @@
 useStr = """
  --Display water usage graph from data found in waterlog.txt--
  Usage:
-  wetsig  [--first=<F>] [--last=<L>] [--minimum=<M>] [--blockfile <B>] [--times <B,E>] [--ratefile <R>] [--offline] [--double]
-  wetsig -h | --help
-  wetsig -v | --version
+  wetgraph  [--first=<F>] [--last=<L>] [--minimum=<M>] [--blockfile <B>] [--times <B,E>] [--ratefile <R>] [--offline] [--double]
+  wetgraph -h | --help
+  wetgraph -v | --version
 
  Options:
   -h --help               Show this screen.
@@ -51,10 +51,11 @@ if __name__ == '__main__':
     print 'From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)),
     print 'to',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtLast2)), 'inclusive'
 
-    lines = getWaterLines(opts['--offline'])     # get a list of the raw file lines
+    bringFile(opts['--offline'])
+    lines = getWaterLines()                     # get a list of the raw file lines
+    stamps = genStamps(opts)
     lines = sliceWaterLines(lines,opts['--first'],opts['--last'])
     stamps = getStampList(lines)                # make a list of time floats
-    print '%d ticks = %.0f gal or %.1f ccf'%(len(stamps),len(stamps)*oneTickVol,len(stamps)*oneTickVol/748.02)
 
     if not opts['--double']:
         stamps = stamps[::2]

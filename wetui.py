@@ -3,7 +3,7 @@
 useStr = """
  -- Display table of water usage found in waterlog.txt --
  Usage:
-  wetui  [--bins=<B>] [--columns=<C>] [--first=<F>] [--last=<L>] [--times <B,E>] [--width=<W>] [--offline]
+  wetui  [--bins=<B>] [--columns=<C>] [--first=<F>] [--last=<L>] [--times <B,E>] [--width=<W>] [--offline] [--generator] [--iterator]
   wetui -h | --help
   wetui -v | --version
 
@@ -12,6 +12,8 @@ useStr = """
   -b --bins <B>           set bin count [default: 84].
   -c --columns <C>        column count in display [default: 12].
   -f --first <F>          first day of range [default: 15-11-21].
+  -g --generator          use python generator instead of list
+  -i --iterator           use python iterator instead of list
   -l --last <L>           last day of range [default: today].
   -t --times <B,E>        select time of day range  [default: 0:0:0,23:59:59].
   -w --width <W>          bin width in seconds [default: 3600].
@@ -28,10 +30,8 @@ Todo:
 import docopt
 from wetbin import *
 
-if __name__ == '__main__':
-    opts = docopt.docopt(useStr,version='0.0.2')
-    # print opts
-
+# @profile
+def main(opts):
     cntCols = int(opts['--columns'])
     tBinSecs = float(opts['--width'])
     cntBins = int(opts['--bins'])
@@ -61,13 +61,32 @@ if __name__ == '__main__':
     print 'start at',time.strftime('%y-%m-%d',time.localtime(dtFirst))
     cntBins = int(1.999+cntBins/cntCols)*cntCols  # round bins up to complete rows
 
-    lines = getWaterLines(opts['--offline'])
-    lines = sliceWaterLines(lines,opts['--first'],opts['--last'])
-    stamps = getStampList(lines)
+    bringFile(opts['--offline'])
+    if opts['--generator']:             # preferred
+        stamps = genStamps(opts)
+    elif opts['--iterator']:
+        stamps = iterStamps(opts)
+    else:
+        lines = getWaterLines()
+        lines = sliceWaterLines(lines,opts['--first'],opts['--last'])
+        stamps = getStampList(lines)
+
     b, m = binTimes(stamps,dtFirst,tBinSecs,cntBins)
     showHeader(cntCols,m)
     showBined(b,cntCols,m)
     footer(stamps)
 
+
+if __name__ == '__main__':
+    opts = docopt.docopt(useStr,version='0.0.2')
+                        # profiling 98k lines before sliceWaterLines to take it down to 553  : 4.31 S
+                        #                      using sliceWaterLines                    553  : 0.11 S
+                        #                      using generator                                 0.12
+                        #                      using iterator                                  0.225
+
+                        #  profiling on 98k stamps into 340 bins of 1 day each, w/o file transfer
+                        #             simple       generator        iterator
+    # print opts        #  Seconds     3.817         3.933            4.192
+    main(opts)          #  mem MB     32.1          22.8             22.2
 
 

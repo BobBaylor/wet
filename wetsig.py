@@ -48,7 +48,8 @@ if __name__ == '__main__':
     opts = docopt.docopt(useStr,version='0.0.2')
     # print opts
 
-    lines = getWaterLines(opts['--offline'])     # get a list of the raw file lines
+    bringFile(opts['--offline'])
+    lines = getWaterLines()                     # get a list of the raw file lines
     stamps = getStampList(lines)                # make a list of time floats
     print 'len',len(stamps)
 
