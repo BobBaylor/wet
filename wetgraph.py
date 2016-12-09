@@ -10,7 +10,7 @@ useStr = """
  Options:
   -h --help               Show this screen.
   -b --blockfile <B>      Name for output block file [default: ]
-  -f --first <F>          first day of range [default: 16-06-10].
+  -f --first <F>          first day of range [default: 16-10-10].
   -l --last <L>           last day of range [default: now].
   -m --minimum <M>        smallest volume (gallons) to show [default: 2].
   -r --ratefile <R>       Name for output rate file [default: ]
@@ -19,6 +19,9 @@ useStr = """
   -d --double             don't skip every other meter tick
   -v --version            show the version
     """
+    
+import matplotlib
+matplotlib.use('TkAgg')
 
 import matplotlib.pylab as plt
 import matplotlib.dates as pdate
