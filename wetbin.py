@@ -1,17 +1,21 @@
 #! /usr/bin/env python
 
-""" wetbin.py water log timestamp binning script
+""" wetbin.py water log timestamp binning functions
     This can be run from any of my 4 locations and it will make sure the waterlog.txt file is copied to where I am.
     This should be run from the wet folder.
+
 """
 import time
 import os
 import platform
 import socket
 from datetime import date, datetime
+try:
+    from wetip import ip260
+except ImportError:
+    ip260 = '127.0.0.0'
+# ip260 = '73.222.30.143'
 
-ip260 = '67.170.222.39'
-# 73.222.30.143
 tStartStr = '15-11-21 00:00:00'
 tBinSecs = 3600.0
 cntBins = 228
@@ -97,34 +101,114 @@ def getStampList(lines):    # convert timestamp text lines to a list of numbers 
     return stamps
 
 
-def getWaterLines(bUseExisting):    # get a list filled with all the timestamp text lines
-    # I could do this with platform.system() which returns 'Linux', 'Darwin', or 'Windows'
-    if not bUseExisting:
-        # determine the OS so we can use the proper cmd to get the waterlog.txt file here
-        myos = platform.system()    # returns 'Linux', 'Darwin', or 'Windows'
-        if 'Linux' in myos:         # I'm on the pi: the file is already here
-            pass                    # todo: differentiate between the wet host and another Linux box
-        elif 'Windows' in myos:                    # I'm on my Win box
-            os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )
-        elif 'Darwin' in myos:                     # I'm at 7C
-            os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
-        else:   # I don't know where I am
-            print 'where am I?',myos
-            return []
+def sliceWaterLines(lines,first,last):
+    bInRange = False
+    print 'slicing',first,'to',last
+    x = []
+    for l in lines:
+        if bInRange:
+            x += [l]
+            if last in l:
+                bInRange = False
+        else:
+            if first in l:
+                bInRange = True
+                x += [l]
+    return x
 
+def bringFile(bUseExisting):
+    if bUseExisting:
+        print 'Using existing waterlog.txt'
+        return
+    # determine the OS so we can use the proper cmd to get the waterlog.txt file here
+    myos = platform.system()    # returns 'Linux', 'Darwin', or 'Windows'
+    if 'Linux' in myos:         # I'm on the pi: the file is already here
+        pass                    # todo: differentiate between the wet host and another Linux box
+    elif 'Windows' in myos:                    # I'm on my Win box
+        os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )
+    elif 'Darwin' in myos:                     # I'm at 7C
+        os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
+    else:   # I don't know where I am
+        print 'where am I?',myos
+
+
+class iterStamps:
+    def __init__(self, opts):
+        self.opts = opts
+        self.lNo = 0         # line number counter to help with bad input
+        self.len = 0         # stamp counter. Only counts the stamps within the requested date range
+        self.tmin = makeTime('15-09-01 12:00:00')
+        self.bInRange = False
+        self.fin = open('waterlog.txt','r')
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return self.len
+
+    def next(self):
+        while True:
+            l, self.lNo = self.fin.readline(), self.lNo+1
+            if not l:
+                self.fin.close()
+                raise StopIteration          # readline() returns zero len string on EOF: we're done
+            l = l.strip()
+            if self.bInRange:
+                if self.opts['--last'] in l:
+                    self.bInRange = False
+            else:
+                if self.opts['--first'] in l:
+                    self.bInRange = True
+            if self.bInRange:
+                t = makeTime(l)
+                if t is None or t < self.tmin:
+                    print 'Bad input at line %6d: %s' %(self.len,l)
+                else:
+                    self.len = self.len+1
+                    return t
+
+
+def getWaterLines():    # get a list filled with all the timestamp text lines
+    # I could do this with platform.system() which returns 'Linux', 'Darwin', or 'Windows'
     with open('waterlog.txt','r') as fin:
         flines = fin.readlines()
     lines = [ln.strip() for ln in flines]
     return lines
 
+
+def genStamps(opts):
+    tmin = makeTime('15-09-01 12:00:00')
+    bInRange = False
+    with open('waterlog.txt','r') as fin:
+        for i, l in enumerate(fin.readlines()):
+            l = l.strip()
+            if bInRange:
+                if opts['--last'] in l:
+                    bInRange = False
+            else:
+                if opts['--first'] in l:
+                    bInRange = True
+            if bInRange:
+                t = makeTime(l)
+                if t is None or t < tmin:
+                    print 'Bad input at line %6d: %s' %(i,ln)
+                else:
+                    yield t
+
+
 def footer(stamps):
-    print "Saw %d lines" %(len(stamps))
-    print 'last 4 intervals at %.3f gpm'%(oneTickVol*240.0/(stamps[-1]-stamps[-5]))
-    print '   last interval at %.3f gpm'%(oneTickVol*60.0/(stamps[-1]-stamps[-2]))
+    try:
+        print "Saw %d lines" %(len(stamps))
+        print 'last 4 intervals at %.3f gpm'%(oneTickVol*240.0/(stamps[-1]-stamps[-5]))
+        print '   last interval at %.3f gpm'%(oneTickVol*60.0/(stamps[-1]-stamps[-2]))
+    except (AttributeError, TypeError):
+        print 'stamps missing  __len__ or __getitem__'
+
 
 if __name__ == '__main__':
     print 'Running wetbin.py stand alone. Try wetui.py for more features.'
-    lines = getWaterLines(False)
+    lines = getWaterLines()
     stamps = getStampList(lines)
     b, m = binTimes(stamps,makeTime(tStartStr),tBinSecs,cntBins)
     showBined(b,cntCols,m)
