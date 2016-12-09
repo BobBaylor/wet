@@ -12,7 +12,7 @@ useStr = """
   -b --bins <B>           set bin count [default: 84].
   -c --columns <C>        column count in display [default: 12].
   -f --first <F>          first day of range [default: 15-11-21].
-  -g --generator          use python generator instead of list
+  -g --generator          use python generator instead of list   <-- preferred
   -i --iterator           use python iterator instead of list
   -l --last <L>           last day of range [default: today].
   -t --times <B,E>        select time of day range  [default: 0:0:0,23:59:59].
