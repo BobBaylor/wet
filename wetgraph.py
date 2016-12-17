@@ -3,7 +3,7 @@
 useStr = """
  --Display water usage graph from data found in waterlog.txt--
  Usage:
-  wetgraph  [--first=<F>] [--last=<L>] [--minimum=<M>] [--blockfile <B>] [--times <B,E>] [--ratefile <R>] [--offline] [--double]
+  wetgraph  [--first=<F>] [--last=<L>] [--minimum=<M>] [--blockfile <B>] [--times <B,E>] [--ratefile <R>] [--savefile <S>] [--offline] [--double]
   wetgraph -h | --help
   wetgraph -v | --version
 
@@ -14,12 +14,13 @@ useStr = """
   -l --last <L>           last day of range [default: now].
   -m --minimum <M>        smallest volume (gallons) to show [default: 2].
   -r --ratefile <R>       Name for output rate file [default: ]
+  -s --savefile <S>       Name for output image file [default: ]
   -t --times <B,E>        select time of day range  [default: 0:0:0,23:59:59].
   -o --offline            don't retrieve waterlog.txt
   -d --double             don't skip every other meter tick
   -v --version            show the version
     """
-    
+
 import matplotlib
 matplotlib.use('TkAgg')
 
@@ -40,9 +41,9 @@ from wetbin import *
 """
 
 
-if __name__ == '__main__':
-    opts = docopt.docopt(useStr,version='0.0.2')
-    # print opts
+
+def makeGraph(opts):
+    global oneTickVol
 
     # do complete rows that include the start and stop bins
     tStart = opts['--times'].split(',')[0]
@@ -96,6 +97,15 @@ if __name__ == '__main__':
     # ax.set_yscale('log')
     ax.grid(True)
     fig.autofmt_xdate()
-    plt.show()
+    if opts['--savefile']:
+        fig.savefig(opts['--savefile'], bbox_inches='tight')
+    else:
+        plt.show()
+
+
+if __name__ == '__main__':
+    opts = docopt.docopt(useStr,version='0.0.2')
+    # print opts
+    makeGraph(opts)
 
 
