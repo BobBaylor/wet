@@ -55,3 +55,20 @@ Not very complicated: There's a 40 pin connector on the pi with General Purpose 
  * The pair of wires to the reed switch can be anything you have laying around: telephone wire, sprinkler wire, speaker wire, etc. 
  * The 560 ohm resistors in series with the reed switch are a half-ass attempt to protect the pi from damage. 
  
+ ## TODO:
+ * Control the sprinklers with the same pi?
+   * Why didn't I think of this before?
+   * mark the waterlog.txt file with sprinkler events
+   * color code and annotate the graphs with sprinkler info
+   * describe schedule with XML or JSON text file
+ * Use threads and queues
+   * thread_gpio adds sprinkler GPIO output to existing wet 
+     * consumes sprinkler event queue
+     * writes to file queue
+     * maintaines valve state object
+   * thread_sprinkler
+     * determines desired valve state based on schedule, etc. 
+     * writes to sprinkler event queue
+   * thread_file 
+     * consumes file queue
+     * writes to waterlog.txt
