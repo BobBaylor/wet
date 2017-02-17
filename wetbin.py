@@ -125,9 +125,13 @@ def bringFile(bUseExisting):
     if 'Linux' in myos:         # I'm on the pi: the file is already here
         pass                    # todo: differentiate between the wet host and another Linux box
     elif 'Windows' in myos:                    # I'm on my Win box
-        os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )
+        eRet = os.system('pscp -i "C:\BobMenu\Good Stuff\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )
+        if eRet:
+            raise OSError(eRet,'Windows failed to scp the file with code %d'%eRet)
     elif 'Darwin' in myos:                     # I'm at 7C
-        os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
+        eRet = os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
+        if eRet:
+            raise (eRet,'OSX failed to scp the file with code %d'%eRet)
     else:   # I don't know where I am
         print 'where am I?',myos
 
