@@ -100,20 +100,19 @@ try:
             bLed = GPIO.LOW
 
     if t != v:          # did the water meter state change?
-      if bfVerbose & VERBOSE_METER:
-        print t,
-      v = t
-      cntT += 1
-      fout = open(fOutName,'a')
-      fout.write('%s\n' % tstamp.strftime('%y-%m-%d %H:%M:%S.%f'))
-      fout.close()
-      time.sleep(0.09)   # add some debounce time
+        if bfVerbose & VERBOSE_METER:
+            print t,
+        v = t
+        cntT += 1
+        with open(fOutName,'a') as fout:
+            fout.write('%s\n' % tstamp.strftime('%y-%m-%d %H:%M:%S.%f'))
+        time.sleep(0.09)   # add some debounce time
 
     time.sleep(0.01)
 
 except KeyboardInterrupt:
-  GPIO.cleanup()
-  print '[%s] done'%get_now()
+    GPIO.cleanup()
+    print '[%s] done'%get_now()
 
 
 print "Saw %d"%cntT, "in %d:%02d:%02d" %timeSince( tStart)
