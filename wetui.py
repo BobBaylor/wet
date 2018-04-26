@@ -33,7 +33,8 @@ from wetbin import *
 # @profile
 def main(opts):
     cntCols = int(opts['--columns'])
-    tBinSecs = float(opts['--width'])
+    tBinSecs = float(eval(opts['--width']))
+    print 'width',tBinSecs
     cntBins = int(opts['--bins'])
 
     # do complete rows that include the start and stop bins
