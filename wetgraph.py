@@ -10,7 +10,7 @@ useStr = """
  Options:
   -h --help               Show this screen.
   -b --blockfile <B>      Name for output block file [default: ]
-  -f --first <F>          first day of range [default: 18-02-26].
+  -f --first <F>          first day of range [default: 18-09-16].
   -l --last <L>           last day of range [default: now].
   -m --minimum <M>        smallest volume (gallons) to show [default: 2].
   -r --ratefile <R>       Name for output rate file [default: ]
