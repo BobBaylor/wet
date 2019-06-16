@@ -34,7 +34,7 @@ from wetbin import *
 def main(opts):
     cntCols = int(opts['--columns'])
     tBinSecs = float(eval(opts['--width']))
-    print 'width',tBinSecs
+    print('width',tBinSecs)
     cntBins = int(opts['--bins'])
 
     # do complete rows that include the start and stop bins
@@ -59,7 +59,7 @@ def main(opts):
       tStart = opts['--times'].split(',')[0]
       dtFirst = makeTime(opts['--first']+' '+tStart)
 
-    print 'start at',time.strftime('%y-%m-%d',time.localtime(dtFirst))
+    print('start at',time.strftime('%y-%m-%d',time.localtime(dtFirst)))
     cntBins = int(1.999+cntBins/cntCols)*cntCols  # round bins up to complete rows
 
     bringFile(opts['--offline'])

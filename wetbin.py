@@ -33,7 +33,7 @@ def makeTime(s):   # seems like this should be in the lib but I can't find it
         v = datetime.strptime( s, '%y-%m-%d %H:%M:%S.%f' )                         # new style with microseconds
         t = time.mktime(v.timetuple())+(v.microsecond*1e-6)
   except ValueError:
-    print 'makeTime() ValueError'
+    print('makeTime() ValueError')
     t = None
   return t
 
@@ -70,22 +70,22 @@ def showHeader(c,b):
     tFmt = '%S'
   # print time.strftime('%y-%m-%d %H:%M:%S',time.localtime(b[0])), w
   tms = [time.strftime(tFmt,time.localtime(b[i])) for i in range(c)]
-  print '%-17s'%('gallons')+'%5s'*c%tuple(tms),
+  print('%-17s'%('gallons')+'%5s'*c%tuple(tms), end=' ')
 
 
 def showBined(d,c,m):
   i = 0
   for j, x in enumerate(d):
     if i == 0:
-      print '\n%6.1f%11s'% (oneTickVol*sum(d[j:j+c]),time.strftime('%a %H:%M',time.localtime(m[j]))),
+      print('\n%6.1f%11s'% (oneTickVol*sum(d[j:j+c]),time.strftime('%a %H:%M',time.localtime(m[j]))), end=' ')
     if x>0:
-        print '%4.0f'%(x*oneTickVol),
+        print('%4.0f'%(x*oneTickVol), end=' ')
     else:
-        print '%4s'%(''),
+        print('%4s'%(''), end=' ')
     i += 1
     if i >= c:
       i = 0
-  print''
+  print('')
 
 
 def getStampList(lines):    # convert timestamp text lines to a list of numbers ready for binning
@@ -94,7 +94,7 @@ def getStampList(lines):    # convert timestamp text lines to a list of numbers 
     for i, ln in enumerate(lines):
         t = makeTime(ln)
         if t is None or t < tmin:
-            print 'Bad input at line %6d: %s' %(i,ln)
+            print('Bad input at line %6d: %s' %(i,ln))
         else:
             # stamps += [time.mktime(datetime.strptime( ln, '%y-%m-%d %H:%M:%S' ).timetuple())]
             stamps += [t]
@@ -103,7 +103,7 @@ def getStampList(lines):    # convert timestamp text lines to a list of numbers 
 
 def sliceWaterLines(lines,first,last):
     bInRange = False
-    print 'slicing',first,'to',last
+    print('slicing',first,'to',last)
     x = []
     for l in lines:
         if bInRange:
@@ -118,7 +118,7 @@ def sliceWaterLines(lines,first,last):
 
 def bringFile(bUseExisting):
     if bUseExisting:
-        print 'Using existing waterlog.txt'
+        print('Using existing waterlog.txt')
         return
     # determine the OS so we can use the proper cmd to get the waterlog.txt file here
     myos = platform.system()    # returns 'Linux', 'Darwin', or 'Windows'
@@ -131,9 +131,9 @@ def bringFile(bUseExisting):
     elif 'Darwin' in myos:                     # I'm at 7C
         eRet = os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
         if eRet:
-            raise (eRet,'OSX failed to scp the file with code %d'%eRet)
+            raise eRet
     else:   # I don't know where I am
-        print 'where am I?',myos
+        print('where am I?',myos)
 
 
 class iterStamps:
@@ -151,7 +151,7 @@ class iterStamps:
     def __len__(self):
         return self.len
 
-    def next(self):
+    def __next__(self):
         while True:
             l, self.lNo = self.fin.readline(), self.lNo+1
             if not l:
@@ -167,7 +167,7 @@ class iterStamps:
             if self.bInRange:
                 t = makeTime(l)
                 if t is None or t < self.tmin:
-                    print 'Bad input at line %6d: %s' %(self.len,l)
+                    print('Bad input at line %6d: %s' %(self.len,l))
                 else:
                     self.len = self.len+1
                     return t
@@ -196,22 +196,22 @@ def genStamps(opts):
             if bInRange:
                 t = makeTime(l)
                 if t is None or t < tmin:
-                    print 'Bad input at line %6d: %s' %(i,ln)
+                    print('Bad input at line %6d: %s' %(i,ln))
                 else:
                     yield t
 
 
 def footer(stamps):
     try:
-        print "Saw %d lines" %(len(stamps))
-        print 'last 4 intervals at %.3f gpm'%(oneTickVol*240.0/(stamps[-1]-stamps[-5]))
-        print '   last interval at %.3f gpm'%(oneTickVol*60.0/(stamps[-1]-stamps[-2]))
+        print("Saw %d lines" %(len(stamps)))
+        print('last 4 intervals at %.3f gpm'%(oneTickVol*240.0/(stamps[-1]-stamps[-5])))
+        print('   last interval at %.3f gpm'%(oneTickVol*60.0/(stamps[-1]-stamps[-2])))
     except (AttributeError, TypeError):
-        print 'stamps missing  __len__ or __getitem__'
+        print('stamps missing  __len__ or __getitem__')
 
 
 if __name__ == '__main__':
-    print 'Running wetbin.py stand alone. Try wetui.py for more features.'
+    print('Running wetbin.py stand alone. Try wetui.py for more features.')
     lines = getWaterLines()
     stamps = getStampList(lines)
     b, m = binTimes(stamps,makeTime(tStartStr),tBinSecs,cntBins)

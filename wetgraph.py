@@ -52,8 +52,8 @@ def makeGraph(opts):
         dtLast2 = time.mktime(time.localtime(time.time()))
     else:
         dtLast2 = time.mktime(datetime.strptime( opts['--last']+' 23:59:59', '%y-%m-%d %H:%M:%S' ).timetuple())
-    print 'From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)),
-    print 'to',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtLast2)), 'inclusive'
+    print('From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)), end=' ')
+    print('to',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtLast2)), 'inclusive')
 
     bringFile(opts['--offline'])
     lines = getWaterLines()                     # get a list of the raw file lines
@@ -66,7 +66,7 @@ def makeGraph(opts):
         oneTickVol = oneTickVol*2.0
 
     selStamps = [x for x in stamps if dtFirst < x < dtLast2]
-    print '%d ticks = %.0f gal or %.1f ccf'%(len(selStamps),len(selStamps)*oneTickVol,len(selStamps)*oneTickVol/748.02)
+    print('%d ticks = %.0f gal or %.1f ccf'%(len(selStamps),len(selStamps)*oneTickVol,len(selStamps)*oneTickVol/748.02))
     diffStamps = [selStamps[i+1]-selStamps[i] for i in range(len(selStamps)-1)]
 
     rates = [oneTickVol*60.0/(x+0.01) for x in diffStamps]
@@ -89,7 +89,7 @@ def makeGraph(opts):
             for t in blocks:
                 fs = '%f'%(t[0]%1)
                 fb.write('%s%s,%7.2f\n'%(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(t[0])),fs[1:],t[1]))
-    xcoords, ycoords = zip(*blocks)
+    xcoords, ycoords = list(zip(*blocks))
     xcoords = [datetime.fromtimestamp(x) for x in xcoords]
     xcoords = pdate.date2num(xcoords)
     fig, ax = plt.subplots()
