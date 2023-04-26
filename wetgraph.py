@@ -3,19 +3,18 @@
 useStr = """
  --Display water usage graph from data found in waterlog.txt--
  Usage:
-  wetgraph  [--first=<F>] [--last=<L>] [--minimum=<M>] [--blockfile <B>] [--times <B,E>] [--ratefile <R>] [--savefile <S>] [--offline] [--double]
+  wetgraph  [--first=<F>] [--last=<L>] [--minimum=<M>] [--blockfile <B>] [--ratefile <R>] [--savefile <S>] [--offline] [--double]
   wetgraph -h | --help
   wetgraph -v | --version
 
  Options:
   -h --help               Show this screen.
   -b --blockfile <B>      Name for output block file [default: ]
-  -f --first <F>          first day of range [default: 22-04-16].
+  -f --first <F>          first day of range [default: 7].
   -l --last <L>           last day of range [default: now].
   -m --minimum <M>        smallest volume (gallons) to show [default: 2].
   -r --ratefile <R>       Name for output rate file [default: ]
   -s --savefile <S>       Name for output image file [default: ]
-  -t --times <B,E>        select time of day range  [default: 0:0:0,23:59:59].
   -o --offline            don't retrieve waterlog.txt
   -d --double             don't skip every other meter tick
   -v --version            show the version
@@ -46,13 +45,12 @@ def makeGraph(opts):
     global oneTickVol
 
     # do complete rows that include the start and stop bins
-    tStart = opts['--times'].split(',')[0]
-    dtFirst = time.mktime(datetime.strptime( opts['--first']+' '+tStart, '%y-%m-%d %H:%M:%S' ).timetuple())
-    if 'now' in opts['--last']:  # default --last means show usage
-        dtLast2 = time.mktime(time.localtime(time.time()))
-    else:
-        dtLast2 = time.mktime(datetime.strptime( opts['--last']+' 23:59:59', '%y-%m-%d %H:%M:%S' ).timetuple())
-    print('From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)), end=' ')
+    dtFirst = time.mktime(time.localtime(time.time())) - abs(int(opts['--first']))*24*60*60
+    dtLast2 = time.mktime(time.localtime(time.time()))
+    if not 'now' in opts['--last']:
+        dtLast2 = dtLast2 - abs(int(opts['--last']))*24*60*60
+
+      print('From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)), end=' ')
     print('to',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtLast2)), 'inclusive')
 
     bringFile(opts['--offline'])
