@@ -50,7 +50,7 @@ def makeGraph(opts):
     if not 'now' in opts['--last']:
         dtLast2 = dtLast2 - abs(int(opts['--last']))*24*60*60
 
-      print('From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)), end=' ')
+    print('From',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtFirst)), end=' ')
     print('to',time.strftime('%y-%m-%d %H:%M:%S',time.localtime(dtLast2)), 'inclusive')
 
     bringFile(opts['--offline'])
