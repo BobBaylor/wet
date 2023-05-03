@@ -7,6 +7,7 @@
 """
 import time
 import os
+import subprocess
 import platform
 import socket
 from datetime import date, datetime
@@ -90,6 +91,7 @@ def showBined(d,c,m):
 
 def getStampList(lines):    # convert timestamp text lines to a list of numbers ready for binning
     stamps = []
+    # print(f'seeing {len(lines)} lines in getStampList()')
     tmin = makeTime('15-09-01 12:00:00')
     for i, ln in enumerate(lines):
         t = makeTime(ln)
@@ -98,14 +100,22 @@ def getStampList(lines):    # convert timestamp text lines to a list of numbers 
         else:
             # stamps += [time.mktime(datetime.strptime( ln, '%y-%m-%d %H:%M:%S' ).timetuple())]
             stamps += [t]
+    # print(f'got {len(stamps)} stamps')
     return stamps
 
 
 def sliceWaterLines(lines,first,last):
-    bInRange = False
-    print('slicing',first,'to',last)
+    bFirst = True
+    # print(f'slicing {first} to {last}...',end='')
     x = []
+    bInRange = False
+    tmin = makeTime(f'{first} 12:00:00')
     for l in lines:
+        if bFirst:
+            t0 = makeTime(l)
+            if t0 > tmin:
+                bInRange = True
+                bFirst = False
         if bInRange:
             x += [l]
             if last in l:
@@ -114,6 +124,7 @@ def sliceWaterLines(lines,first,last):
             if first in l:
                 bInRange = True
                 x += [l]
+    # print(f'and got {len(x)}.')
     return x
 
 def bringFile(bUseExisting):
@@ -125,9 +136,23 @@ def bringFile(bUseExisting):
     if 'Linux' in myos:         # I'm on the pi: the file is already here
         pass                    # todo: differentiate between the wet host and another Linux box
     elif 'Windows' in myos:                    # I'm on my Win box
-        eRet = os.system('pscp -i "C:\Program Files\PuTTY\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )
-        if eRet:
-            raise OSError(eRet,'Windows failed to scp the file with code %d'%eRet)
+        pth = r'"C:\Program Files\Putty\pscp"'
+        args = r' -i "C:\Program Files\PuTTY\ssh-rsa-pi.ppk"'
+        cmd = r' -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260
+        try:
+            output = subprocess.check_output(r'%s %s %s'%(pth,args,cmd),stderr=subprocess.STDOUT)
+            # print('-- Success:\n%s'%output)
+            """  b'\rwaterlog.txt              | 32 kB |  32.0 kB/s | ETA: 00:00:38 |   2%\rwaterlog.txt              | 192 kB | 192.0 kB/s | ETA: 00:00:05 |  15%\rwaterlog.txt              | 928 kB | 464.0 kB/s | ETA: 00:00:00 |  72%\rwaterlog.txt              | 1273 kB | 637.0 kB/s | ETA: 00:00:00 | 100%\r\n'
+            """
+        except subprocess.CalledProcessError as er:
+            print('** FAILURE: **\n%s'%str(er))
+            print('** Error output: **\n%s'%er.output)
+
+        # cmd_S = r'"C:\Program Files\Putty\pscp" -i "C:\Program Files\PuTTY\ssh-rsa-pi.ppk" -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260
+        # print(cmd_S)
+        # eRet = os.system(cmd_S)
+        # if eRet:
+        #     raise OSError(eRet,'Windows failed to scp the file with code %d'%eRet)
     elif 'Darwin' in myos:                     # I'm at 7C
         eRet = os.system('scp -P 801 pi@%s:/home/pi/wet/waterlog.txt .'%ip260 )       # I'm on one of my macs
         if eRet:
@@ -178,6 +203,7 @@ def getWaterLines():    # get a list filled with all the timestamp text lines
     with open('waterlog.txt','r') as fin:
         flines = fin.readlines()
     lines = [ln.strip() for ln in flines]
+    # print(f'got {len(lines)} lines')
     return lines
 
 
@@ -206,7 +232,7 @@ def footer(stamps):
         print("Saw %d lines" %(len(stamps)))
         print('last 4 intervals at %.3f gpm'%(oneTickVol*240.0/(stamps[-1]-stamps[-5])))
         print('   last interval at %.3f gpm'%(oneTickVol*60.0/(stamps[-1]-stamps[-2])))
-    except (AttributeError, TypeError):
+    except (AttributeError, TypeError, IndexError):
         print('stamps missing  __len__ or __getitem__')
 
 
