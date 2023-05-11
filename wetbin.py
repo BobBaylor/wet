@@ -109,11 +109,14 @@ def sliceWaterLines(lines,first,last):
     # print(f'slicing {first} to {last}...',end='')
     x = []
     bInRange = False
-    tmin = makeTime(f'{first} 12:00:00')
+    if len(first) < 3:
+        tmin = time.mktime(datetime.now().timetuple()) - int(first)*86400
+    else:
+        tmin = makeTime(f'{first} 12:00:00')
     for l in lines:
         if bFirst:
             t0 = makeTime(l)
-            if t0 > tmin:
+            if t0 and t0 > tmin:
                 bInRange = True
                 bFirst = False
         if bInRange:
