@@ -94,6 +94,7 @@ def makeGraph(opts):
     plt.gca().xaxis.set_major_formatter(pdate.DateFormatter('%m/%d/%Y %H:%M:%S'))
     ax.plot(xcoords, ycoords,'k-', lw=2)
     plt.gcf().autofmt_xdate()
+    ax.grid(True)
     if opts['--savefile']:
         fig.savefig(opts['--savefile'], bbox_inches='tight')
     else:
