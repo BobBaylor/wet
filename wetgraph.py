@@ -90,11 +90,10 @@ def makeGraph(opts):
     xcoords, ycoords = list(zip(*blocks))
     xcoords = [datetime.fromtimestamp(x) for x in xcoords]
     xcoords = pdate.date2num(xcoords)
-    fig, ax = plt.subplots()
-    ax.plot_date(xcoords, ycoords,'k-', lw=2)
-    # ax.set_yscale('log')
-    ax.grid(True)
-    fig.autofmt_xdate()
+    fig, ax = plt.subplots()    
+    plt.gca().xaxis.set_major_formatter(pdate.DateFormatter('%m/%d/%Y %H:%M:%S'))
+    ax.plot(xcoords, ycoords,'k-', lw=2)
+    plt.gcf().autofmt_xdate()
     if opts['--savefile']:
         fig.savefig(opts['--savefile'], bbox_inches='tight')
     else:
